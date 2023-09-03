@@ -40,7 +40,6 @@ export const registeruser = catchAsyncError(async (req, res, next) => {
 
 export const loginctrl = catchAsyncError(async (req, res, next) => {
   const { email, password } = req.body;
-  //   const file = req.file;
 
   if (!email || !password)
     return next(new ErrorHandler("Please enter all the Fields", 400));
@@ -51,6 +50,7 @@ export const loginctrl = catchAsyncError(async (req, res, next) => {
   const isMatch = await user.comparePassword(password);
   if (!isMatch)
     return next(new ErrorHandler("Try to Login with Right Creditionsals", 401));
+
   sendToken(res, user, `Welcome back ${user.name}`, 200);
 });
 
@@ -59,7 +59,11 @@ export const logoutctrl = catchAsyncError(async (req, res, next) => {
     .status(200)
     .cookie("token", null, {
       expires: new Date(Date.now()),
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
     })
+
     .json({
       success: true,
       message: "LoggedOut SucessFully wish to Come back Again",
